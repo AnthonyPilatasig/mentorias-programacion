@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400" role="img" aria-labelledby="t d">
+  <title id="t">Sesión de mentoría</title>
+  <desc id="d">Pantalla con código y un globo de conversación</desc>
+  <rect width="640" height="400" rx="20" fill="#E3F1EF"/>
+  <rect x="70" y="60" width="380" height="250" rx="14" fill="#0E1A2B"/>
+  <circle cx="96" cy="86" r="6" fill="#F2A65A"/><circle cx="116" cy="86" r="6" fill="#7FD1C7"/><circle cx="136" cy="86" r="6" fill="#9DB4D0"/>
+  <rect x="96" y="116" width="150" height="10" rx="5" fill="#7FD1C7"/>
+  <rect x="116" y="142" width="220" height="10" rx="5" fill="#9DB4D0"/>
+  <rect x="116" y="168" width="170" height="10" rx="5" fill="#F2A65A"/>
+  <rect x="136" y="194" width="200" height="10" rx="5" fill="#9DB4D0"/>
+  <rect x="116" y="220" width="120" height="10" rx="5" fill="#7FD1C7"/>
+  <rect x="96" y="246" width="60" height="10" rx="5" fill="#7FD1C7"/>
+  <rect x="330" y="250" width="240" height="90" rx="16" fill="#0A6F6A"/>
+  <path d="M370 340 l-14 30 l40 -30z" fill="#0A6F6A"/>
+  <rect x="352" y="274" width="170" height="10" rx="5" fill="#FFFFFF"/>
+  <rect x="352" y="298" width="120" height="10" rx="5" fill="#CDE9E5"/>
+</svg>

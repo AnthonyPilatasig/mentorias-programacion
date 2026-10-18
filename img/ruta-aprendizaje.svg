@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400" role="img" aria-labelledby="t d">
+  <title id="t">Ruta de aprendizaje</title>
+  <desc id="d">Camino con tres puntos que sube hacia una bandera</desc>
+  <rect width="640" height="400" rx="20" fill="#FDF0E1"/>
+  <path d="M60 330 C180 330 160 220 280 220 S400 280 470 160 S540 90 560 80" fill="none" stroke="#14213D" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 18"/>
+  <circle cx="90" cy="330" r="22" fill="#0A6F6A"/>
+  <circle cx="280" cy="220" r="22" fill="#0A6F6A"/>
+  <circle cx="470" cy="160" r="22" fill="#0A6F6A"/>
+  <path d="M560 80 V30" stroke="#14213D" stroke-width="6" stroke-linecap="round"/>
+  <path d="M560 30 h50 l-14 16 l14 16 h-50z" fill="#B4530A"/>
+</svg>

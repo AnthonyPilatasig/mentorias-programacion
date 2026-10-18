@@ -1,0 +1,60 @@
+{
+  "desbordamiento_px": {
+    "320": 0,
+    "360": 0,
+    "414": 0,
+    "640": 0,
+    "768": 0,
+    "1024": 0,
+    "1280": 0,
+    "1440": 0
+  },
+  "axe": {
+    "360": {
+      "v": [],
+      "p": 45
+    },
+    "768": {
+      "v": [],
+      "p": 45
+    },
+    "1280": {
+      "v": [],
+      "p": 45
+    }
+  },
+  "tab_movil": [
+    "skip-link|Saltar al contenido|outline=solid 3px",
+    "brand|</>\n        Mentorías de |outline=solid 3px",
+    "nav-toggle|Menú|outline=solid 3px",
+    "btn btn-primary|Reservar una sesión|outline=solid 3px",
+    "btn btn-ghost|Ver temas|outline=solid 3px",
+    "PRE|// Una clase, una respons|outline=solid 3px",
+    "chip|Todos|outline=solid 3px",
+    "chip|Fundamentos|outline=solid 3px"
+  ],
+  "menu": {
+    "tras_enter": "true",
+    "visible": true,
+    "tras_esc": "false",
+    "foco_boton": "nav-toggle"
+  },
+  "filtro_java": {
+    "estado": "Mostrando 3 de 6 mentorías.",
+    "visibles": 3,
+    "pressed": "true"
+  },
+  "filtro_todos": "Mostrando 6 de 6 mentorías.",
+  "form_vacio": {
+    "resumen_visible": true,
+    "n_errores": 4,
+    "foco_en": "resumen-errores",
+    "aria_invalid": 5
+  },
+  "correo_invalido": "Escribe un correo válido, por ejemplo nombre@dominio.com.",
+  "form_ok": {
+    "exito": "Gracias, Ana. Recibí tu solicitud y te escribiré al correo indicado.",
+    "resumen_oculto": true
+  },
+  "sin_js_menu_visible": true
+}

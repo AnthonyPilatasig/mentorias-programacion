@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mentorías de programación con Anthony Pilatasig</title>
+  <meta name="description" content="Mentorías personalizadas de programación en Java, POO, web y bases de datos, dirigidas a estudiantes de software. Sesiones en línea.">
+  <link rel="stylesheet" href="css/styles.css">
+  <script>document.documentElement.classList.add("js");</script>
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <header class="site-header">
+    <div class="wrap header-bar">
+      <a class="brand" href="#inicio" aria-label="Mentorías de código, ir al inicio">
+        <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+        <span>Mentorías de código</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
+        <span class="nav-toggle-text">Menú</span>
+      </button>
+      <nav id="menu-principal" class="site-nav" aria-label="Principal">
+        <ul>
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#mentorias">Mentorías</a></li>
+          <li><a href="#proceso">Cómo funciona</a></li>
+          <li><a href="#sobre-mi">Sobre mí</a></li>
+          <li><a href="#contacto" class="nav-cta">Reservar</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section id="inicio" class="hero" aria-labelledby="titulo-inicio">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <h1 id="titulo-inicio">Aprende a programar con alguien que te acompaña paso a paso</h1>
+          <p class="lead">Mentorías en línea para estudiantes de software que quieren entender la lógica, no solo copiar código. Trabajamos sobre tus tareas y proyectos reales.</p>
+          <p class="hero-actions">
+            <a class="btn btn-primary" href="#contacto">Reservar una sesión</a>
+            <a class="btn btn-ghost" href="#mentorias">Ver temas</a>
+          </p>
+        </div>
+        <figure class="code-card">
+          <figcaption class="visually-hidden">Ejemplo de código Java que se trabaja en las mentorías</figcaption>
+<pre><code><span class="c">// Una clase, una responsabilidad</span>
+<span class="k">public class</span> <span class="t">Estudiante</span> {
+    <span class="k">private</span> String nombre;
+    <span class="k">private double</span> promedio;
+
+    <span class="k">public boolean</span> <span class="f">aprueba</span>() {
+        <span class="k">return</span> promedio &gt;= 7.0;
+    }
+}</code></pre>
+        </figure>
+      </div>
+    </section>
+
+    <section id="mentorias" class="section" aria-labelledby="titulo-mentorias">
+      <div class="wrap">
+        <h2 id="titulo-mentorias">Temas de mentoría</h2>
+        <p class="section-intro">Elige un área para ver las sesiones disponibles.</p>
+
+        <div class="filters" role="group" aria-label="Filtrar mentorías por tema">
+          <button type="button" class="chip" data-filter="todos" aria-pressed="true">Todos</button>
+          <button type="button" class="chip" data-filter="fundamentos" aria-pressed="false">Fundamentos</button>
+          <button type="button" class="chip" data-filter="java" aria-pressed="false">Java y POO</button>
+          <button type="button" class="chip" data-filter="web" aria-pressed="false">Web</button>
+          <button type="button" class="chip" data-filter="datos" aria-pressed="false">Datos</button>
+        </div>
+        <p id="filtro-estado" class="filter-status" role="status" aria-live="polite">Mostrando 6 de 6 mentorías.</p>
+
+        <ul class="cards" id="lista-mentorias">
+          <li class="card" data-tema="fundamentos">
+            <h3>Lógica y algoritmos</h3>
+            <p>Del enunciado al pseudocódigo y a la prueba de escritorio, con ejercicios de condicionales y ciclos.</p>
+            <p class="meta">Nivel inicial · 60 min</p>
+          </li>
+          <li class="card" data-tema="java">
+            <h3>Java desde cero</h3>
+            <p>Variables, métodos, arreglos y manejo de entradas para escribir programas que compilan a la primera.</p>
+            <p class="meta">Nivel inicial · 60 min</p>
+          </li>
+          <li class="card" data-tema="java">
+            <h3>Programación orientada a objetos</h3>
+            <p>Clases, herencia, polimorfismo e interfaces explicados con ejemplos que puedes ejecutar.</p>
+            <p class="meta">Nivel intermedio · 90 min</p>
+          </li>
+          <li class="card" data-tema="web">
+            <h3>HTML, CSS y JavaScript</h3>
+            <p>Páginas semánticas, diseño responsivo y accesible, e interacciones sin dependencias innecesarias.</p>
+            <p class="meta">Nivel inicial · 60 min</p>
+          </li>
+          <li class="card" data-tema="datos">
+            <h3>SQL y modelado de datos</h3>
+            <p>Tablas, relaciones y consultas para diseñar una base de datos que no se rompa al crecer.</p>
+            <p class="meta">Nivel intermedio · 90 min</p>
+          </li>
+          <li class="card" data-tema="java">
+            <h3>Proyecto final en Java</h3>
+            <p>Estructura, organización en paquetes y revisión de código de tu proyecto de fin de ciclo.</p>
+            <p class="meta">Nivel intermedio · 90 min</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="proceso" class="section section-alt" aria-labelledby="titulo-proceso">
+      <div class="wrap split">
+        <div>
+          <h2 id="titulo-proceso">Cómo funciona</h2>
+          <ol class="steps">
+            <li><strong>Cuéntame qué necesitas.</strong> Llenas el formulario con tu tema y tu nivel.</li>
+            <li><strong>Acordamos horario.</strong> Te respondo por correo con opciones de sesión en línea.</li>
+            <li><strong>Trabajamos tu código.</strong> Resolvemos dudas con tus propios ejercicios y te dejo práctica para la semana.</li>
+          </ol>
+        </div>
+        <img class="fluid" src="img/ruta-aprendizaje.svg" width="640" height="400" loading="lazy"
+             alt="Camino de tres puntos que sube hacia una bandera, que representa el avance en la mentoría">
+      </div>
+    </section>
+
+    <section id="sobre-mi" class="section" aria-labelledby="titulo-sobre-mi">
+      <div class="wrap split split-reverse">
+        <img class="fluid" src="img/sesion-codigo.svg" width="640" height="400" loading="lazy"
+             alt="Pantalla con código y un globo de conversación, que representa una sesión de mentoría en línea">
+        <div>
+          <h2 id="titulo-sobre-mi">Sobre mí</h2>
+          <p>Soy Anthony Pilatasig. Estudio Ingeniería en Software en la Universidad Politécnica Salesiana y doy clases de Java y programación orientada a objetos en el Instituto Superior Tecnológico Mayor Pedro Traversari.</p>
+          <p>Como también soy estudiante, sé dónde se traban los temas y cómo explicarlos sin dar por hecho lo que aún no se ha visto.</p>
+          <p><a href="https://github.com/AnthonyPilatasig" rel="noopener">Ver mi perfil de GitHub</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto" class="section section-alt" aria-labelledby="titulo-contacto">
+      <div class="wrap form-wrap">
+        <h2 id="titulo-contacto">Reserva tu sesión</h2>
+        <p class="section-intro">Los campos marcados con asterisco (*) son obligatorios.</p>
+
+        <div id="resumen-errores" class="error-summary" role="alert" tabindex="-1" hidden>
+          <h3>Revisa estos campos</h3>
+          <ul id="lista-errores"></ul>
+        </div>
+
+        <form id="form-contacto" novalidate>
+          <div class="field">
+            <label for="nombre">Nombre completo *</label>
+            <input id="nombre" name="nombre" type="text" autocomplete="name" required aria-describedby="nombre-error">
+            <p id="nombre-error" class="field-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="correo">Correo electrónico *</label>
+            <input id="correo" name="correo" type="email" autocomplete="email" required aria-describedby="correo-ayuda correo-error">
+            <p id="correo-ayuda" class="hint">Aquí te enviaré las opciones de horario.</p>
+            <p id="correo-error" class="field-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="tema">Tema de la mentoría *</label>
+            <select id="tema" name="tema" required aria-describedby="tema-error">
+              <option value="">Selecciona un tema</option>
+              <option value="fundamentos">Lógica y algoritmos</option>
+              <option value="java">Java y POO</option>
+              <option value="web">HTML, CSS y JavaScript</option>
+              <option value="datos">SQL y modelado de datos</option>
+            </select>
+            <p id="tema-error" class="field-error" hidden></p>
+          </div>
+
+          <fieldset class="field" aria-describedby="nivel-error">
+            <legend>Tu nivel actual *</legend>
+            <div class="radios">
+              <label class="radio"><input type="radio" name="nivel" value="inicial"> Inicial</label>
+              <label class="radio"><input type="radio" name="nivel" value="intermedio"> Intermedio</label>
+            </div>
+            <p id="nivel-error" class="field-error" hidden></p>
+          </fieldset>
+
+          <div class="field">
+            <label for="mensaje">¿Qué quieres lograr?</label>
+            <textarea id="mensaje" name="mensaje" rows="4" aria-describedby="mensaje-ayuda"></textarea>
+            <p id="mensaje-ayuda" class="hint">Opcional. Por ejemplo: entender herencia antes de mi examen.</p>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+        </form>
+
+        <p id="exito" class="success" role="status" tabindex="-1" hidden></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Proyecto académico de Aplicaciones Web, Universidad Politécnica Salesiana. Contenido de ejemplo.</p>
+    </div>
+  </footer>
+</body>
+</html>
