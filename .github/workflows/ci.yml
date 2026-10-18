@@ -28,12 +28,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Validate JavaScript Syntax
-        run: node --check js/main.js
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Validate HTML Structure
-        run: npx --yes html-validate index.html
+      - name: Run Quality & Lint Tests
+        run: npm test
 
       - name: Verify Essential Assets
         run: |

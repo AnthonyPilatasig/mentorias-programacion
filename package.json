@@ -1,0 +1,14 @@
+{
+  "name": "mentorias-programacion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sitio web responsivo y accesible para mentorías de programación en línea",
+  "scripts": {
+    "lint:js": "node --check js/main.js",
+    "lint:html": "html-validate index.html",
+    "test": "npm run lint:js && npm run lint:html"
+  },
+  "devDependencies": {
+    "html-validate": "^8.24.1"
+  }
+}
