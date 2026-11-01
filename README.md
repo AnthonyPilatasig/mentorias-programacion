@@ -20,9 +20,45 @@ Autor: Anthony David Pilatasig Macas.
 | Pruebas | 90 pruebas xUnit (unitarias + integración con MySQL real vía Testcontainers) y colección Postman de 34 aserciones |
 | Documentación | OpenAPI 3.1 en `/openapi/v1.json` y referencia interactiva en `/docs` |
 
+## Estructura del repositorio
+
+```
+mentorias-programacion/
+├── frontend/              Sitio web (Unidad 1, conectado a la API en la Unidad 2)
+│   ├── index.html         Página principal con el formulario «Reserva tu sesión»
+│   ├── panel.html         Panel del mentor (inicio de sesión, reservas en vivo, adjuntos)
+│   ├── css/  js/  img/
+│   └── evidencias/        Capturas de la Unidad 1
+├── backend/               API REST (Unidad 2)
+│   ├── src/Mentorias.Api/ Código de la API
+│   ├── tests/             90 pruebas xUnit
+│   ├── postman/           Colección de Postman y archivos de prueba
+│   ├── requests/          Peticiones .http para VS Code / Visual Studio
+│   ├── evidencias/        Capturas y resultados de pruebas de la Unidad 2
+│   └── Dockerfile
+├── docker-compose.yml     Levanta MySQL + API con un solo comando
+└── .env.example           Credenciales por defecto (opcional cambiarlas)
+```
+
+## Cómo funciona
+
+```
+Navegador ──► http://localhost:8080 ──► API (ASP.NET Core) ──► MySQL
+               │                          │
+               ├─ /, /panel.html          └─ entrega también las páginas de frontend/
+               ├─ /api/...  (datos JSON)
+               └─ /hubs/reservas (tiempo real)
+```
+
+No hay dos servidores separados: **la API entrega las páginas del frontend y responde a sus peticiones desde la
+misma dirección** (`localhost:8080`). Así el navegador trata todo como un solo sitio: la cookie de sesión del mentor
+funciona (por seguridad no se envía a otros dominios) y no hace falta configurar permisos entre dominios (CORS).
+
 ## Ejecutar
 
-Requisito: Docker Desktop.
+### Opción 1: con Docker (recomendada)
+
+Requisito: [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y **abierto**.
 
 ```bash
 git clone https://github.com/AnthonyPilatasig/mentorias-programacion.git
@@ -30,8 +66,8 @@ cd mentorias-programacion
 docker compose up --build
 ```
 
-La API sirve también el sitio de `frontend/`: todo queda en el mismo origen, la cookie `SameSite=Strict` funciona
-y no hace falta CORS.
+La primera vez tarda unos minutos (descarga MySQL y compila la API). Cuando la consola muestre
+`Now listening on: http://[::]:8080`, abre:
 
 | URL | Qué es |
 |---|---|
@@ -40,19 +76,30 @@ y no hace falta CORS.
 | http://localhost:8080/docs | Documentación interactiva de la API |
 | http://localhost:8080/health | Estado de la API y de MySQL |
 
-Las credenciales se pueden cambiar copiando `.env.example` a `.env`. MySQL queda expuesto en el puerto **3307**.
+Para detener todo: `Ctrl + C` y luego `docker compose down` (agrega `-v` para borrar también los datos de MySQL).
 
-La versión publicada en [GitHub Pages](https://anthonypilatasig.github.io/mentorias-programacion/) es solo el
-frontend estático: allí el formulario avisa de que el servicio de reservas no está disponible.
+Las credenciales se pueden cambiar copiando `.env.example` a `.env`. MySQL queda expuesto en el puerto **3307**
+del equipo (no el 3306) para no chocar con un MySQL instalado localmente.
 
-### Desarrollo sin contenedor para la API
+### Opción 2: API con `dotnet run` (para programar)
+
+Requisitos: Docker Desktop (solo para MySQL) y [.NET SDK 10](https://dotnet.microsoft.com/download).
 
 ```bash
-docker compose up -d db
-dotnet run --project backend/src/Mentorias.Api   # http://localhost:5212, sirve ../../../frontend
+docker compose up -d db                          # solo MySQL
+dotnet run --project backend/src/Mentorias.Api   # API en http://localhost:5212
 ```
 
-### Pruebas
+En modo desarrollo la API lee las páginas directamente de `frontend/`, así que los cambios en HTML, CSS o JS se
+ven al recargar el navegador, sin reconstruir nada.
+
+### Opción 3: solo el frontend
+
+Abrir `frontend/index.html` o la versión publicada en
+[GitHub Pages](https://anthonypilatasig.github.io/mentorias-programacion/). El sitio, el menú y el filtro funcionan,
+pero como no hay API detrás, el formulario avisa que el servicio de reservas no está disponible.
+
+## Pruebas
 
 ```bash
 cd backend
