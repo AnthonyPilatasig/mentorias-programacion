@@ -1,0 +1,1003 @@
+{
+  "info": {
+    "name": "API Mentorías de código",
+    "description": "Colección de pruebas de la API (Unidad 2). Ejecutar en orden: newman run postman/Mentorias.postman_collection.json -e postman/local.postman_environment.json",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Salud y catálogo",
+      "item": [
+        {
+          "name": "Salud",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y base de datos conectada', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().estado).to.eql('ok');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar mentorías",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/mentorias"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 con las 6 mentorías', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json()).to.have.lengthOf(6);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Filtrar mentorías por categoría",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/mentorias?categoria=java"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Solo categoría java', () => {",
+                  "  pm.response.json().forEach((m) => pm.expect(m.categoria).to.eql('java'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mentoría inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/mentorias/99"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 con ProblemDetails (mentoria_no_encontrada)', () => {",
+                  "  pm.response.to.have.status(404);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(404);",
+                  "  pm.expect(p.codigo).to.eql('mentoria_no_encontrada');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Horarios de un día",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/horarios?fecha={{fecha}}&mentoriaId=3"
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Elige al azar un día hábil entre 5 y 50 días adelante para que la colección sea repetible.",
+                  "let d;",
+                  "do {",
+                  "  d = new Date(Date.now() - 5 * 3600e3 + (5 + Math.floor(Math.random() * 45)) * 864e5);",
+                  "} while (d.getUTCDay() === 0);",
+                  "pm.collectionVariables.set('fecha', d.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 con horarios en hora de Ecuador', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().zonaHoraria).to.eql('America/Guayaquil');",
+                  "});",
+                  "const h = pm.response.json().horarios;",
+                  "// Primer horario libre que tenga otro libre una hora después (para probar el solapamiento).",
+                  "const i = h.findIndex((x, k) => x.disponible && h[k + 2] && h[k + 2].disponible);",
+                  "pm.test('Hay un horario libre', () => pm.expect(i).to.be.at.least(0));",
+                  "pm.collectionVariables.set('inicio', h[i].inicio);",
+                  "pm.collectionVariables.set('inicioSolapado', h[i + 2].inicio);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Horarios sin parámetros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/horarios"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 con ProblemDetails (validacion)', () => {",
+                  "  pm.response.to.have.status(400);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(400);",
+                  "  pm.expect(p.codigo).to.eql('validacion');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});",
+                  "pm.test('Indica los campos faltantes', () => {",
+                  "  pm.expect(pm.response.json().errors).to.have.all.keys('fecha', 'mentoriaId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Reservas (público)",
+      "item": [
+        {
+          "name": "Crear reserva",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mentoriaId\": 3,\n  \"nombre\": \"María José Andrade\",\n  \"correo\": \"maria.andrade@correo.com\",\n  \"nivel\": \"intermedio\",\n  \"mensaje\": \"Quiero entender herencia e interfaces\",\n  \"inicio\": \"{{inicio}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 con Location y ETag', () => {",
+                  "  pm.response.to.have.status(201);",
+                  "  pm.expect(pm.response.headers.get('Location')).to.match(/^\\/api\\/reservas\\/\\d+$/);",
+                  "  pm.expect(pm.response.headers.get('ETag')).to.eql('\"1\"');",
+                  "});",
+                  "const r = pm.response.json();",
+                  "pm.test('Estado pendiente y fin = inicio + 90 min', () => {",
+                  "  pm.expect(r.estado).to.eql('pendiente');",
+                  "  pm.expect(new Date(r.fin) - new Date(r.inicio)).to.eql(90 * 60e3);",
+                  "});",
+                  "pm.collectionVariables.set('reservaId', r.id);",
+                  "pm.collectionVariables.set('etag', pm.response.headers.get('ETag'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear reserva que se cruza (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mentoriaId\": 1,\n  \"nombre\": \"María José Andrade\",\n  \"correo\": \"otro@correo.com\",\n  \"nivel\": \"intermedio\",\n  \"mensaje\": \"Quiero entender herencia e interfaces\",\n  \"inicio\": \"{{inicioSolapado}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409 con ProblemDetails (horario_ocupado)', () => {",
+                  "  pm.response.to.have.status(409);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(409);",
+                  "  pm.expect(p.codigo).to.eql('horario_ocupado');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear reserva inválida (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mentoriaId\": 0,\n  \"nombre\": \"J\",\n  \"correo\": \"no-es-correo\",\n  \"nivel\": \"experto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 con ProblemDetails (validacion)', () => {",
+                  "  pm.response.to.have.status(400);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(400);",
+                  "  pm.expect(p.codigo).to.eql('validacion');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});",
+                  "pm.test('Errores por campo', () => {",
+                  "  pm.expect(pm.response.json().errors).to.have.all.keys('mentoriaId', 'nombre', 'correo', 'nivel', 'inicio');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "JSON mal formado (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mentoriaId\": "
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 con ProblemDetails (peticion_invalida)', () => {",
+                  "  pm.response.to.have.status(400);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(400);",
+                  "  pm.expect(p.codigo).to.eql('peticion_invalida');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Sesión del mentor",
+      "item": [
+        {
+          "name": "Listar reservas sin sesión (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/reservas"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 con ProblemDetails (no_autenticado)', () => {",
+                  "  pm.response.to.have.status(401);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(401);",
+                  "  pm.expect(p.codigo).to.eql('no_autenticado');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login incorrecto (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{mentorCorreo}}\",\n  \"password\": \"equivocada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 con ProblemDetails (credenciales_invalidas)', () => {",
+                  "  pm.response.to.have.status(401);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(401);",
+                  "  pm.expect(p.codigo).to.eql('credenciales_invalidas');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{mentorCorreo}}\",\n  \"password\": \"{{mentorPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y cookie de sesión HttpOnly', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  const c = pm.response.headers.get('Set-Cookie').toLowerCase();",
+                  "  pm.expect(c).to.include('mentorias.sesion=');",
+                  "  pm.expect(c).to.include('httponly');",
+                  "  pm.expect(c).to.include('samesite=strict');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sesión actual",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/me"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 con los datos del mentor', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().correo).to.eql(pm.environment.get('mentorCorreo') || pm.collectionVariables.get('mentorCorreo'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Reservas (mentor)",
+      "item": [
+        {
+          "name": "Listar con filtros y paginación",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/reservas?estado=pendiente&desde={{fecha}}&hasta={{fecha}}&pagina=1&tamano=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 paginado con la reserva creada', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p).to.include.keys('items', 'pagina', 'tamano', 'total', 'totalPaginas');",
+                  "  pm.expect(p.items.map((r) => r.id)).to.include(Number(pm.collectionVariables.get('reservaId')));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener reserva",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 con ETag', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.headers.get('ETag')).to.eql(pm.collectionVariables.get('etag'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar sin If-Match (428)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mentoriaId\": 3,\n  \"nombre\": \"María José Andrade\",\n  \"correo\": \"maria.andrade@correo.com\",\n  \"nivel\": \"intermedio\",\n  \"mensaje\": \"Quiero entender herencia e interfaces\",\n  \"inicio\": \"{{inicio}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('428 con ProblemDetails (version_requerida)', () => {",
+                  "  pm.response.to.have.status(428);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(428);",
+                  "  pm.expect(p.codigo).to.eql('version_requerida');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar con ETag viejo (412)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "If-Match",
+                "value": "\"99\""
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mentoriaId\": 3,\n  \"nombre\": \"María José Andrade\",\n  \"correo\": \"maria.andrade@correo.com\",\n  \"nivel\": \"intermedio\",\n  \"mensaje\": \"Quiero entender herencia e interfaces\",\n  \"inicio\": \"{{inicio}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('412 con ProblemDetails (version_desactualizada)', () => {",
+                  "  pm.response.to.have.status(412);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(412);",
+                  "  pm.expect(p.codigo).to.eql('version_desactualizada');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar reserva",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "If-Match",
+                "value": "{{etag}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mentoriaId\": 3,\n  \"nombre\": \"María José Andrade Ruiz\",\n  \"correo\": \"maria.andrade@correo.com\",\n  \"nivel\": \"intermedio\",\n  \"mensaje\": \"Quiero entender herencia e interfaces\",\n  \"inicio\": \"{{inicio}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y versión 2', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().version).to.eql(2);",
+                  "  pm.expect(pm.response.headers.get('ETag')).to.eql('\"2\"');",
+                  "});",
+                  "pm.collectionVariables.set('etag', pm.response.headers.get('ETag'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirmar reserva",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "If-Match",
+                "value": "{{etag}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}/estado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"confirmada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y estado confirmada', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().estado).to.eql('confirmada');",
+                  "});",
+                  "pm.collectionVariables.set('etag', pm.response.headers.get('ETag'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Transición inválida (409)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "If-Match",
+                "value": "{{etag}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}/estado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"confirmada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409 con ProblemDetails (transicion_invalida)', () => {",
+                  "  pm.response.to.have.status(409);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(409);",
+                  "  pm.expect(p.codigo).to.eql('transicion_invalida');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Adjuntos",
+      "item": [
+        {
+          "name": "Subir PDF",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}/adjuntos",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/archivos/tarea.pdf"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 con hash SHA-256', () => {",
+                  "  pm.response.to.have.status(201);",
+                  "  const a = pm.response.json();",
+                  "  pm.expect(a.tipoContenido).to.eql('application/pdf');",
+                  "  pm.expect(a.sha256).to.match(/^[0-9a-f]{64}$/);",
+                  "  pm.collectionVariables.set('adjuntoId', a.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Subir ejecutable renombrado (415)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}/adjuntos",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/archivos/falso.pdf"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('415 con ProblemDetails (contenido_no_coincide)', () => {",
+                  "  pm.response.to.have.status(415);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(415);",
+                  "  pm.expect(p.codigo).to.eql('contenido_no_coincide');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar adjuntos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}/adjuntos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 con un adjunto', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json()).to.have.lengthOf(1);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Descargar adjunto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/adjuntos/{{adjuntoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 como descarga y sin sniffing', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment');",
+                  "  pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar adjunto",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/adjuntos/{{adjuntoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Limpieza y cierre de sesión",
+      "item": [
+        {
+          "name": "Eliminar reserva",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "If-Match",
+                "value": "{{etag}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reserva eliminada (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/reservas/{{reservaId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 con ProblemDetails (reserva_no_encontrada)', () => {",
+                  "  pm.response.to.have.status(404);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(404);",
+                  "  pm.expect(p.codigo).to.eql('reserva_no_encontrada');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cerrar sesión",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/logout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sesión cerrada (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/me"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 con ProblemDetails (no_autenticado)', () => {",
+                  "  pm.response.to.have.status(401);",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p.status).to.eql(401);",
+                  "  pm.expect(p.codigo).to.eql('no_autenticado');",
+                  "  pm.expect(p).to.have.property('traceId');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "fecha",
+      "value": ""
+    },
+    {
+      "key": "inicio",
+      "value": ""
+    },
+    {
+      "key": "inicioSolapado",
+      "value": ""
+    },
+    {
+      "key": "reservaId",
+      "value": ""
+    },
+    {
+      "key": "etag",
+      "value": ""
+    },
+    {
+      "key": "adjuntoId",
+      "value": ""
+    }
+  ]
+}

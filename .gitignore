@@ -36,3 +36,13 @@ node_modules/
 .cache/
 tmp/
 temp/
+
+# .NET (backend)
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+.vs/
+TestResults/
+App_Data/
+*.trx

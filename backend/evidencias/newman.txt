@@ -1,0 +1,153 @@
+newman
+
+API Mentorías de código
+
+□ 1. Salud y catálogo
+└ Salud
+  GET http://localhost:8080/health [200 OK, 249B, 62ms]
+  √  200 y base de datos conectada
+
+└ Listar mentorías
+  GET http://localhost:8080/api/mentorias [200 OK, 1.55kB, 35ms]
+  √  200 con las 6 mentorías
+
+└ Filtrar mentorías por categoría
+  GET http://localhost:8080/api/mentorias?categoria=java [200 OK, 881B, 18ms]
+  √  Solo categoría java
+
+└ Mentoría inexistente
+  GET http://localhost:8080/api/mentorias/99 [404 Not Found, 511B, 29ms]
+  √  404 con ProblemDetails (mentoria_no_encontrada)
+
+└ Horarios de un día
+  GET http://localhost:8080/api/horarios?fecha=2026-11-10&mentoriaId=3 [200 OK, 2.34kB, 70ms]
+  √  200 con horarios en hora de Ecuador
+  √  Hay un horario libre
+
+└ Horarios sin parámetros
+  GET http://localhost:8080/api/horarios [400 Bad Request, 603B, 11ms]
+  √  400 con ProblemDetails (validacion)
+  √  Indica los campos faltantes
+
+□ 2. Reservas (público)
+└ Crear reserva
+  POST http://localhost:8080/api/reservas [201 Created, 697B, 25ms]
+  √  201 con Location y ETag
+  √  Estado pendiente y fin = inicio + 90 min
+
+└ Crear reserva que se cruza (409)
+  POST http://localhost:8080/api/reservas [409 Conflict, 581B, 13ms]
+  √  409 con ProblemDetails (horario_ocupado)
+
+└ Crear reserva inválida (400)
+  POST http://localhost:8080/api/reservas [400 Bad Request, 838B, 10ms]
+  √  400 con ProblemDetails (validacion)
+  √  Errores por campo
+
+└ JSON mal formado (400)
+  POST http://localhost:8080/api/reservas [400 Bad Request, 563B, 13ms]
+  √  400 con ProblemDetails (peticion_invalida)
+
+□ 3. Sesión del mentor
+└ Listar reservas sin sesión (401)
+  GET http://localhost:8080/api/reservas [401 Unauthorized, 457B, 14ms]
+  √  401 con ProblemDetails (no_autenticado)
+
+└ Login incorrecto (401)
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 512B, 107ms]
+  √  401 con ProblemDetails (credenciales_invalidas)
+
+└ Login
+  POST http://localhost:8080/api/auth/login [200 OK, 808B, 134ms]
+  √  200 y cookie de sesión HttpOnly
+
+└ Sesión actual
+  GET http://localhost:8080/api/auth/me [200 OK, 303B, 39ms]
+  √  200 con los datos del mentor
+
+□ 4. Reservas (mentor)
+└ Listar con filtros y paginación
+  GET http://localhost:8080/api/reservas?estado=pendiente&desde=2026-11-10&hasta=2026-11-10&pagina=1&tamano=5 [200 OK, 715B, 107ms]
+  √  200 paginado con la reserva creada
+
+└ Obtener reserva
+  GET http://localhost:8080/api/reservas/5 [200 OK, 665B, 30ms]
+  √  200 con ETag
+
+└ Actualizar sin If-Match (428)
+  PUT http://localhost:8080/api/reservas/5 [428 Precondition Required, 583B, 92ms]
+  √  428 con ProblemDetails (version_requerida)
+
+└ Actualizar con ETag viejo (412)
+  PUT http://localhost:8080/api/reservas/5 [412 Precondition Failed, 579B, 17ms]
+  √  412 con ProblemDetails (version_desactualizada)
+
+└ Actualizar reserva
+  PUT http://localhost:8080/api/reservas/5 [200 OK, 670B, 52ms]
+  √  200 y versión 2
+
+└ Confirmar reserva
+  PATCH http://localhost:8080/api/reservas/5/estado [200 OK, 671B, 95ms]
+  √  200 y estado confirmada
+
+└ Transición inválida (409)
+  PATCH http://localhost:8080/api/reservas/5/estado [409 Conflict, 545B, 15ms]
+  √  409 con ProblemDetails (transicion_invalida)
+
+□ 5. Adjuntos
+└ Subir PDF
+  POST http://localhost:8080/api/reservas/5/adjuntos [201 Created, 547B, 127ms]
+  √  201 con hash SHA-256
+
+└ Subir ejecutable renombrado (415)
+  POST http://localhost:8080/api/reservas/5/adjuntos [415 Unsupported Media Type, 560B, 17ms]
+  √  415 con ProblemDetails (contenido_no_coincide)
+
+└ Listar adjuntos
+  GET http://localhost:8080/api/reservas/5/adjuntos [200 OK, 482B, 29ms]
+  √  200 con un adjunto
+
+└ Descargar adjunto
+  GET http://localhost:8080/api/adjuntos/18dc78fe-19ea-4e1d-85f3-2f55d1fe4d44 [200 OK, 415B, 24ms]
+  √  200 como descarga y sin sniffing
+
+└ Eliminar adjunto
+  DELETE http://localhost:8080/api/adjuntos/18dc78fe-19ea-4e1d-85f3-2f55d1fe4d44 [204 No Content, 167B, 35ms]
+  √  204
+
+□ 6. Limpieza y cierre de sesión
+└ Eliminar reserva
+  DELETE http://localhost:8080/api/reservas/5 [204 No Content, 167B, 46ms]
+  √  204
+
+└ Reserva eliminada (404)
+  GET http://localhost:8080/api/reservas/5 [404 Not Found, 505B, 12ms]
+  √  404 con ProblemDetails (reserva_no_encontrada)
+
+└ Cerrar sesión
+  POST http://localhost:8080/api/auth/logout [204 No Content, 364B, 39ms]
+  √  204
+
+└ Sesión cerrada (401)
+  GET http://localhost:8080/api/auth/me [401 Unauthorized, 456B, 7ms]
+  √  401 con ProblemDetails (no_autenticado)
+
+┌─────────────────────────┬───────────────────┬──────────────────┐
+│                         │          executed │           failed │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              iterations │                 1 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│                requests │                30 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│            test-scripts │                30 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│      prerequest-scripts │                 1 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              assertions │                34 │                0 │
+├─────────────────────────┴───────────────────┴──────────────────┤
+│ total run duration: 3.7s                                       │
+├────────────────────────────────────────────────────────────────┤
+│ total data received: 11.18kB (approx)                          │
+├────────────────────────────────────────────────────────────────┤
+│ average response time: 44ms [min: 7ms, max: 134ms, s.d.: 36ms] │
+└────────────────────────────────────────────────────────────────┘

@@ -7,6 +7,7 @@
   <meta name="description" content="Mentorías personalizadas de programación en Java, POO, web y bases de datos, dirigidas a estudiantes de software. Sesiones en línea.">
   <link rel="stylesheet" href="css/styles.css">
   <script>document.documentElement.classList.add("js");</script>
+  <script src="js/lib/signalr.min.js" defer></script>
   <script src="js/main.js" defer></script>
 </head>
 <body>
@@ -27,6 +28,7 @@
           <li><a href="#mentorias">Mentorías</a></li>
           <li><a href="#proceso">Cómo funciona</a></li>
           <li><a href="#sobre-mi">Sobre mí</a></li>
+          <li><a href="panel.html">Panel del mentor</a></li>
           <li><a href="#contacto" class="nav-cta">Reservar</a></li>
         </ul>
       </nav>
@@ -156,21 +158,37 @@
           <div class="field">
             <label for="correo">Correo electrónico *</label>
             <input id="correo" name="correo" type="email" autocomplete="email" required aria-describedby="correo-ayuda correo-error">
-            <p id="correo-ayuda" class="hint">Aquí te enviaré las opciones de horario.</p>
+            <p id="correo-ayuda" class="hint">Aquí te enviaré la confirmación de la sesión.</p>
             <p id="correo-error" class="field-error" hidden></p>
           </div>
 
           <div class="field">
-            <label for="tema">Tema de la mentoría *</label>
-            <select id="tema" name="tema" required aria-describedby="tema-error">
-              <option value="">Selecciona un tema</option>
-              <option value="fundamentos">Lógica y algoritmos</option>
-              <option value="java">Java y POO</option>
-              <option value="web">HTML, CSS y JavaScript</option>
-              <option value="datos">SQL y modelado de datos</option>
+            <label for="mentoriaId">Mentoría *</label>
+            <select id="mentoriaId" name="mentoriaId" required aria-describedby="mentoriaId-error">
+              <option value="">Selecciona una mentoría</option>
+              <option value="1">Lógica y algoritmos · 60 min</option>
+              <option value="2">Java desde cero · 60 min</option>
+              <option value="3">Programación orientada a objetos · 90 min</option>
+              <option value="4">HTML, CSS y JavaScript · 60 min</option>
+              <option value="5">SQL y modelado de datos · 90 min</option>
+              <option value="6">Proyecto final en Java · 90 min</option>
             </select>
-            <p id="tema-error" class="field-error" hidden></p>
+            <p id="mentoriaId-error" class="field-error" hidden></p>
           </div>
+
+          <div class="field">
+            <label for="fecha">Día *</label>
+            <input id="fecha" name="fecha" type="date" required aria-describedby="fecha-ayuda fecha-error">
+            <p id="fecha-ayuda" class="hint">De lunes a sábado, hasta 60 días adelante. Hora de Ecuador.</p>
+            <p id="fecha-error" class="field-error" hidden></p>
+          </div>
+
+          <fieldset class="field" aria-describedby="horarios-estado inicio-error">
+            <legend>Horario *</legend>
+            <p id="horarios-estado" class="hint" role="status" aria-live="polite">Elige una mentoría y un día para ver los horarios libres.</p>
+            <div id="horarios" class="slots"></div>
+            <p id="inicio-error" class="field-error" hidden></p>
+          </fieldset>
 
           <fieldset class="field" aria-describedby="nivel-error">
             <legend>Tu nivel actual *</legend>
@@ -183,11 +201,12 @@
 
           <div class="field">
             <label for="mensaje">¿Qué quieres lograr?</label>
-            <textarea id="mensaje" name="mensaje" rows="4" aria-describedby="mensaje-ayuda"></textarea>
+            <textarea id="mensaje" name="mensaje" rows="4" maxlength="500" aria-describedby="mensaje-ayuda mensaje-error"></textarea>
             <p id="mensaje-ayuda" class="hint">Opcional. Por ejemplo: entender herencia antes de mi examen.</p>
+            <p id="mensaje-error" class="field-error" hidden></p>
           </div>
 
-          <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+          <button type="submit" class="btn btn-primary">Reservar sesión</button>
         </form>
 
         <p id="exito" class="success" role="status" tabindex="-1" hidden></p>
@@ -197,7 +216,7 @@
 
   <footer class="site-footer">
     <div class="wrap">
-      <p>Proyecto académico de Aplicaciones Web, Universidad Politécnica Salesiana. Contenido de ejemplo.</p>
+      <p>Proyecto académico de Aplicaciones Web, Universidad Politécnica Salesiana. Las reservas se guardan en la API del backend.</p>
     </div>
   </footer>
 </body>

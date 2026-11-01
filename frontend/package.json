@@ -4,8 +4,8 @@
   "private": true,
   "description": "Sitio web responsivo y accesible para mentorías de programación en línea",
   "scripts": {
-    "lint:js": "node --check js/main.js",
-    "lint:html": "html-validate index.html",
+    "lint:js": "node --check js/main.js && node --check js/panel.js && node --check js/api.js",
+    "lint:html": "html-validate index.html panel.html",
     "test": "npm run lint:js && npm run lint:html"
   },
   "devDependencies": {

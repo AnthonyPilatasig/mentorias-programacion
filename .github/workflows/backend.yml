@@ -1,0 +1,27 @@
+name: Backend (pruebas y Docker)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet restore
+      - run: dotnet build --no-restore -c Release
+      - name: Pruebas (unitarias + integración con MySQL en Testcontainers)
+        run: dotnet test --no-build -c Release --logger "console;verbosity=normal"
+      - name: Imagen Docker (API + frontend)
+        working-directory: .
+        run: docker build -f backend/Dockerfile -t mentorias .

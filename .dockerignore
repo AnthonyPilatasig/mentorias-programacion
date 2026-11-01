@@ -1,0 +1,11 @@
+**/bin
+**/obj
+**/App_Data
+**/node_modules
+**/evidencias
+backend/tests
+backend/postman
+.git
+.github
+.vs
+.vscode

@@ -1,0 +1,101 @@
+# Peticiones de ejemplo (Visual Studio, Rider o la extensión REST Client de VS Code).
+# Ejecuta en orden. La cookie de sesión se conserva automáticamente entre peticiones.
+@base = http://localhost:8080
+@fecha = 2026-11-10
+
+### Salud
+GET {{base}}/health
+
+### Catálogo de mentorías (filtro opcional por categoría)
+GET {{base}}/api/mentorias?categoria=java
+
+### Horarios libres de un día para una mentoría
+GET {{base}}/api/horarios?fecha={{fecha}}&mentoriaId=3
+
+### Crear reserva (público) -> 201 + Location + ETag
+# @name crear
+POST {{base}}/api/reservas
+Content-Type: application/json
+
+{
+  "mentoriaId": 3,
+  "nombre": "María José Andrade",
+  "correo": "maria.andrade@correo.com",
+  "nivel": "intermedio",
+  "mensaje": "Quiero entender herencia e interfaces",
+  "inicio": "{{fecha}}T10:00:00-05:00"
+}
+
+### Mismo horario otra vez -> 409 horario_ocupado
+POST {{base}}/api/reservas
+Content-Type: application/json
+
+{
+  "mentoriaId": 1,
+  "nombre": "Luis Pérez",
+  "correo": "luis@correo.com",
+  "nivel": "inicial",
+  "inicio": "{{fecha}}T11:00:00-05:00"
+}
+
+### Datos inválidos -> 400 con errores por campo
+POST {{base}}/api/reservas
+Content-Type: application/json
+
+{ "mentoriaId": 0, "nombre": "J", "correo": "malo", "nivel": "experto" }
+
+### Login del mentor -> cookie HttpOnly 'mentorias.sesion'
+POST {{base}}/api/auth/login
+Content-Type: application/json
+
+{ "correo": "mentor@mentorias.dev", "password": "Mentor#2026" }
+
+### Sesión actual
+GET {{base}}/api/auth/me
+
+### Listar reservas (filtros y paginación)
+GET {{base}}/api/reservas?estado=pendiente&desde={{fecha}}&hasta={{fecha}}&pagina=1&tamano=10
+
+### Obtener una reserva (devuelve ETag)
+GET {{base}}/api/reservas/{{crear.response.body.id}}
+
+### Reemplazar datos (requiere If-Match; sin él -> 428, con versión vieja -> 412)
+PUT {{base}}/api/reservas/{{crear.response.body.id}}
+Content-Type: application/json
+If-Match: "1"
+
+{
+  "mentoriaId": 3,
+  "nombre": "María José Andrade Ruiz",
+  "correo": "maria.andrade@correo.com",
+  "nivel": "intermedio",
+  "mensaje": "Herencia, interfaces y polimorfismo",
+  "inicio": "{{fecha}}T10:00:00-05:00"
+}
+
+### Confirmar (pendiente -> confirmada)
+PATCH {{base}}/api/reservas/{{crear.response.body.id}}/estado
+Content-Type: application/json
+If-Match: "2"
+
+{ "estado": "confirmada" }
+
+### Subir adjunto (multipart/form-data, máx. 2 MB)
+POST {{base}}/api/reservas/{{crear.response.body.id}}/adjuntos
+Content-Type: multipart/form-data; boundary=limite
+
+--limite
+Content-Disposition: form-data; name="archivo"; filename="tarea.pdf"
+Content-Type: application/pdf
+
+< ../postman/archivos/tarea.pdf
+--limite--
+
+### Listar adjuntos
+GET {{base}}/api/reservas/{{crear.response.body.id}}/adjuntos
+
+### Eliminar reserva (y sus adjuntos)
+DELETE {{base}}/api/reservas/{{crear.response.body.id}}
+
+### Cerrar sesión
+POST {{base}}/api/auth/logout

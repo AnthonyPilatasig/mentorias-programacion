@@ -1,0 +1,40 @@
+# Levanta MySQL 8.4 y la API (que también sirve el sitio de frontend/):  docker compose up --build
+# Sitio: http://localhost:8080   Panel: http://localhost:8080/panel.html   API: http://localhost:8080/docs
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: mentorias
+      MYSQL_USER: mentorias
+      MYSQL_PASSWORD: ${DB_PASSWORD:-mentorias_dev}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_dev}
+    ports:
+      - "3307:3306"   # 3307 en el equipo para no chocar con un MySQL local
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Mentorias: "server=db;port=3306;database=mentorias;user=mentorias;password=${DB_PASSWORD:-mentorias_dev}"
+      Mentor__Correo: ${MENTOR_CORREO:-mentor@mentorias.dev}
+      Mentor__Password: ${MENTOR_PASSWORD:-Mentor#2026}
+    ports:
+      - "8080:8080"
+    volumes:
+      - datos-app:/app/App_Data   # adjuntos y claves de Data Protection
+
+volumes:
+  mysql-data:
+  datos-app:

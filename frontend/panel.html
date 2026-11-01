@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel del mentor · Mentorías de código</title>
+  <link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">&lt;/&gt;</span> Mentorías de código</a>
+      <nav class="site-nav" aria-label="Principal">
+        <a href="index.html#contacto">Reservar</a>
+        <a href="panel.html" aria-current="page">Panel del mentor</a>
+        <a href="/docs">API</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido" class="wrap">
+    <section id="vista-login" class="card" aria-labelledby="titulo-login" hidden>
+      <h1 id="titulo-login">Iniciar sesión</h1>
+      <p class="hint">Acceso solo para el mentor. La sesión se guarda en el servidor y expira tras 2 horas sin actividad.</p>
+      <form id="form-login" novalidate>
+        <p id="login-error" class="resumen-errores" tabindex="-1" hidden></p>
+        <div class="field">
+          <label for="login-correo">Correo</label>
+          <input id="login-correo" name="correo" type="email" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="login-password">Contraseña</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn" type="submit">Entrar</button>
+      </form>
+    </section>
+
+    <div id="vista-panel" class="layout-panel" hidden>
+      <section aria-labelledby="titulo-panel" class="stack">
+        <div class="toolbar">
+          <div>
+            <h1 id="titulo-panel">Reservas</h1>
+            <p class="hint" id="saludo"></p>
+          </div>
+          <div class="field">
+            <label for="filtro-estado">Estado</label>
+            <select id="filtro-estado">
+              <option value="">Todos</option>
+              <option value="pendiente">Pendientes</option>
+              <option value="confirmada">Confirmadas</option>
+              <option value="completada">Completadas</option>
+              <option value="cancelada">Canceladas</option>
+            </select>
+          </div>
+          <button id="btn-logout" class="btn btn-secundario" type="button">Cerrar sesión</button>
+        </div>
+        <p id="aviso" class="aviso" role="alert" hidden></p>
+        <p class="hint" id="conteo" role="status"></p>
+        <ul class="reservas" id="reservas"></ul>
+        <nav class="paginacion" aria-label="Páginas">
+          <button class="btn btn-secundario btn-sm" id="pag-anterior" type="button">Anterior</button>
+          <span id="pag-info"></span>
+          <button class="btn btn-secundario btn-sm" id="pag-siguiente" type="button">Siguiente</button>
+        </nav>
+      </section>
+
+      <aside class="card" aria-labelledby="titulo-actividad">
+        <h2 id="titulo-actividad">Actividad en tiempo real</h2>
+        <p class="live" id="estado-hub" data-estado="desconectado">Sin conexión en vivo</p>
+        <ol class="actividad" id="actividad" aria-live="polite"></ol>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">Demo de la API REST · Aplicaciones Web, Unidad 2 · Anthony Pilatasig</div>
+  </footer>
+
+  <script src="js/lib/signalr.min.js"></script>
+  <script type="module" src="js/panel.js"></script>
+</body>
+</html>
